@@ -135,7 +135,6 @@ def main():
     # Load configuration from JSON file    
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, required=True, help='Path to the config file')
-    parser.add_argument('--resume', action='store_true', help='Resume from checkpoint')
     args = parser.parse_args()
 
     with open(args.config, 'r') as f:
