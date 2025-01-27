@@ -10,10 +10,10 @@ The purpose of this repository is to demonstrate the organization and execution 
 ## Repository Contents
 
 - **`CustomDataset.py`**: Script for handling and preprocessing dataset inputs.
-- **`Model.py`**: Contains the implementation of the defect level identification model.
-- **`Tools.py`**: Includes utility functions and tools for data processing and model evaluation.
-- **`main.py`**: The main script to execute the model.
-- **`train_single.py`**: Script for training the model on a single dataset or configuration.
+- **`Model.py`**: The implementation of the defect level identification model.
+- **`Tools.py`**: Utility functions and tools.
+- **`main.py`**: The main script to execute the training and testing.
+- **`train_single.py`**: Script for training the a single base model. 
 - **`configs.json`**: Configuration file for specifying model parameters, data paths, and other settings.
 - **`requirements.txt`**: Lists the dependencies required for the project.
 - **`README.md`**: Documentation of the repository.
