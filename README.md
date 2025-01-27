@@ -9,9 +9,15 @@ The purpose of this repository is to demonstrate the organization and execution 
 
 ## Repository Contents
 
-- **`main.py`**: The main script for running the defect level identification model.
-- **`configs.json`**: A configuration file for specifying model settings, data paths, and other parameters.
-- **Example Dataset**: A demonstration dataset for testing the structure and workflow.
+- **`CustomDataset.py`**: Script for handling and preprocessing dataset inputs.
+- **`Model.py`**: Contains the implementation of the defect level identification model.
+- **`Tools.py`**: Includes utility functions and tools for data processing and model evaluation.
+- **`main.py`**: The main script to execute the model.
+- **`train_single.py`**: Script for training the model on a single dataset or configuration.
+- **`configs.json`**: Configuration file for specifying model parameters, data paths, and other settings.
+- **`requirements.txt`**: Lists the dependencies required for the project.
+- **`README.md`**: Documentation of the repository.
+- **`data/`**: Directory for storing synthetic training, testing, and validation datasets.
 
 ## Getting Started
 
@@ -28,7 +34,7 @@ To install the required dependencies, run:
 pip install -r requirements.txt
 ```
 
-## Runing The Model:
+### Runing The Model:
 
 First Clone the Repository:
 
