@@ -1,16 +1,15 @@
 {
     "batch_size": 40,
-    "num_epochs": 2,
+    "num_epochs": 70,
     "learning_rate": 5e-5,
-    "early_stopping_patience": 1,
+    "early_stopping_patience": 30,
     "num_classes": 4,
     "max_grad_norm": 1.0,
-    "model_save_path": "/home/slm/Mapping_Descriptions_to_Level/Saved_Models",
-    "bert_path": "/home/slm/Models/chinese-bert-wwm",
-    "data_path": "/home/slm/Mapping_Descriptions_to_Level/Data/",
-    "val_data_path": "/home/slm/Mapping_Descriptions_to_Level/Data/test.xlsx",
-    "test_data_path": "/home/slm/Mapping_Descriptions_to_Level/Data/test.xlsx",
-    "max_seq_len": 256,
+    "model_save_path": "Your Path Here",
+    "bert_path": "Your Path Here",
+    "data_path": "Your Path Here",
+    "val_data_path": "Your Path Here",
+    "test_data_path": "Your Path Here",
     "projected_dim": 256,
     "num_layers": 3,
     "growth_rate": 64,
@@ -20,7 +19,7 @@
     "max_smoothing":0.5,
     "smoothing_scale":0.5,
     "hold_epoch":8,
-    "num_base_learners":2,
-    "train_file_path": "/home/slm/Mapping_Descriptions_to_Level/train_single.py"
+    "num_base_learners":10,
+    "train_file_path": "Your Path Here"
   }
   
