@@ -55,6 +55,9 @@ This section provides a detailed explanation of the configurations specified in 
 
 
 ### **General Configurations**
+
+Adjust there parameters according to your training settings.
+
 - **`batch_size`**  
   The number of samples processed in one forward/backward pass during training. Adjust it based on your GPU RAM.  
 
@@ -62,20 +65,25 @@ This section provides a detailed explanation of the configurations specified in 
   The total number of training cycles the model will go through.    
 
 - **`learning_rate`**  
-  The step size at which the model updates its parameters during training.   
+  The step size at which the model updates its parameters during training.
+  
+- **`dropout_rate`**  
+  Dropout rate applied to prevent overfitting. 
 
 - **`early_stopping_patience`**  
   Number of epochs without improvement in validation performance before training stops early.   
 
 - **`num_classes`**  
-  Number of output classes for the classification task.    
+  Number of output classes for the classification task.
 
-### **Optimization Configurations**
 - **`max_grad_norm`**  
   A gradient clipping parameter to prevent exploding gradients during training. Gradients are scaled to have a maximum norm of `1.0`.   
 
 
 ### **Paths**
+
+Adjust there parameters according to directories.
+
 - **`model_save_path`**  
   Directory path where the trained models will be saved.    
 
@@ -96,6 +104,9 @@ This section provides a detailed explanation of the configurations specified in 
 
 
 ## **Sequence and Model Settings**
+
+Do not adjust there parameters unless you know what you are doing.
+
 - **`max_seq_len`**  
   Maximum length of input sequences for the model. Longer sequences will be truncated.    
 
@@ -112,11 +123,10 @@ This section provides a detailed explanation of the configurations specified in 
   List specifying the dimensions for the transition layers in the model.    
 
 
-## **Regularization Configurations**
-- **`dropout_rate`**  
-  Dropout rate applied to prevent overfitting. 
-
 ## **Parameters For the Customized Training Strategy**
+
+Try optimize these parameters based on experiments on your own dataset.
+
 - **`am_percentile`**  
   Percentile value used in AM threshold calculations.  
 
