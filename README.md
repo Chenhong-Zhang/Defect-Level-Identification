@@ -39,7 +39,7 @@ pip install -r requirements.txt
 First Clone the Repository:
 
 ```bash
-git clone https://github.com/your-username/Defect-Level-Identification.git
+git clone https://github.com/Chenhong-Zhang/Defect-Level-Identification.git
 cd Defect-Level-Identification
 ```
 
