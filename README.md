@@ -53,7 +53,6 @@ python main.py --config configs.json
 
 This section provides a detailed explanation of the configurations specified in the `configs.json` file.
 
----
 
 ### **General Configurations**
 - **`batch_size`**  
@@ -71,13 +70,10 @@ This section provides a detailed explanation of the configurations specified in 
 - **`num_classes`**  
   Number of output classes for the classification task.    
 
----
-
 ### **Optimization Configurations**
 - **`max_grad_norm`**  
   A gradient clipping parameter to prevent exploding gradients during training. Gradients are scaled to have a maximum norm of `1.0`.   
 
----
 
 ### **Paths**
 - **`model_save_path`**  
@@ -98,7 +94,6 @@ This section provides a detailed explanation of the configurations specified in 
 - **`train_file_path`**  
   Path to the training script used to run the model.    
 
----
 
 ## **Sequence and Model Settings**
 - **`max_seq_len`**  
@@ -116,13 +111,10 @@ This section provides a detailed explanation of the configurations specified in 
 - **`transition_layers`**  
   List specifying the dimensions for the transition layers in the model.    
 
----
 
 ## **Regularization Configurations**
 - **`dropout_rate`**  
   Dropout rate applied to prevent overfitting. 
-
----
 
 ## **Parameters For the Customized Training Strategy**
 - **`am_percentile`**  
@@ -140,6 +132,5 @@ This section provides a detailed explanation of the configurations specified in 
 - **`num_base_learners`**  
   Number of base learners used for ensemble.  
 
----
 
 
