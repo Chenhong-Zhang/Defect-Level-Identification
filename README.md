@@ -48,3 +48,98 @@ Then run the code:
 ```bash
 python main.py --config configs.json
 ```
+
+## Configuration Details
+
+This section provides a detailed explanation of the configurations specified in the `configs.json` file.
+
+---
+
+### **General Configurations**
+- **`batch_size`**  
+  The number of samples processed in one forward/backward pass during training. Adjust it based on your GPU RAM.  
+
+- **`num_epochs`**  
+  The total number of training cycles the model will go through.    
+
+- **`learning_rate`**  
+  The step size at which the model updates its parameters during training.   
+
+- **`early_stopping_patience`**  
+  Number of epochs without improvement in validation performance before training stops early.   
+
+- **`num_classes`**  
+  Number of output classes for the classification task.    
+
+---
+
+### **Optimization Configurations**
+- **`max_grad_norm`**  
+  A gradient clipping parameter to prevent exploding gradients during training. Gradients are scaled to have a maximum norm of `1.0`.   
+
+---
+
+### **Paths**
+- **`model_save_path`**  
+  Directory path where the trained models will be saved.    
+
+- **`bert_path`**  
+  Path to the pre-trained BERT model used for feature extraction.    
+
+- **`data_path`**  
+  Path to the directory containing training, validation, and testing datasets.    
+
+- **`val_data_path`**  
+  File path to the validation dataset.    
+
+- **`test_data_path`**  
+  File path to the testing dataset.   
+
+- **`train_file_path`**  
+  Path to the training script used to run the model.    
+
+---
+
+## **Sequence and Model Settings**
+- **`max_seq_len`**  
+  Maximum length of input sequences for the model. Longer sequences will be truncated.    
+
+- **`projected_dim`**  
+  Dimension to which input embeddings are projected before further processing.   
+
+- **`num_layers`**  
+  Number of layers in the model architecture.    
+
+- **`growth_rate`**  
+  Growth rate for dense layers in the architecture.    
+
+- **`transition_layers`**  
+  List specifying the dimensions for the transition layers in the model.    
+
+---
+
+## **Regularization Configurations**
+- **`dropout_rate`**  
+  Dropout rate applied to prevent overfitting. 
+
+---
+
+## **Parameters For the Customized Training Strategy**
+- **`am_percentile`**  
+  Percentile value used in AM threshold calculations.  
+
+- **`max_smoothing`**  
+  Maximum smoothing parameter for loss smoothing.  
+
+- **`smoothing_scale`**  
+  Scale factor for loss smoothing.   
+
+- **`hold_epoch`**  
+  Number of epochs before activating the dynamic partitioning.  
+
+- **`num_base_learners`**  
+  Number of base learners used for ensemble.  
+
+---
+
+
