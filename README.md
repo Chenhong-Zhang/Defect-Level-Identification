@@ -103,7 +103,7 @@ Adjust there parameters according to directories.
   Path to the training script used to run the model.    
 
 
-## **Sequence and Model Settings**
+### **Sequence and Model Settings**
 
 Do not adjust there parameters unless you know what you are doing.
 
@@ -123,7 +123,7 @@ Do not adjust there parameters unless you know what you are doing.
   List specifying the dimensions for the transition layers in the model.    
 
 
-## **Parameters For the Customized Training Strategy**
+### **Parameters For the Customized Training Strategy**
 
 Try optimize these parameters based on experiments on your own dataset.
 
