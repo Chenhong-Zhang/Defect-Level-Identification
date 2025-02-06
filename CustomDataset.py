@@ -11,42 +11,36 @@ class TrainDataset(Dataset):
         self.data = dataframe.reset_index(drop=True)
         self.tokenizer = tokenizer
         self.max_length = max_length
-        self.mode = mode  # 取值为 'train'、'val' 或 'test'
+        self.mode = mode  # 'train'、'val' 或 'test'
 
-        # Mapping feature names from Chinese to English
         self.feature_name_mapping = {
-            '病害描述': 'defect_description',
-            '部件': 'component',
-            '预测病害数量修正': 'defect_number_correction',
-            '裂缝宽度': 'crack_width',
-            '病害面积': 'defect_area',
-            '病害长度': 'defect_length',
-            '预测病害数量指示': 'defect_number_indicator',
-            '其他指示符': 'dimension_indicator'
+            'Defect Description': 'defect_description',
+            'Component': 'component',            
         }
 
+        
         # Text feature names
         self.text_features = [
-            '病害描述',
-            '部件',
+            'Defect Description',
+            'Component',
         ]
 
         # Group for "defect_dimension_numerical"
         self.dimension_numerical_features = [
-            '裂缝宽度',           # Crack Width
-            '病害面积',           # Defect Area
-            '病害长度',           # Defect Length
-            '其他指示符'          # Dimension Indicator
+            'Defect Width', 
+            'Defect Area',
+            'Defect Length',
+            'Dimension Specified' 
         ]
 
         # Group for "defect_number"
         self.defect_number_features = [
-            '预测病害数量修正',    # Defect Number Correction
-            '预测病害数量指示'     # Defect Number Indicator
+            'Defect Quantity',
+            'Quantity Specified'
         ]
 
         # Labels
-        self.labels = self.data['病害标度'].values
+        self.labels = self.data['Defect Level'].values
 
         # Initialize scalers
         self.scalers = {}
@@ -91,10 +85,10 @@ class TrainDataset(Dataset):
                 return_tensors='pt'
             )
             # Map Chinese feature name to English
-            english_feature_name = self.feature_name_mapping[feature_name]
+            feature_name = self.feature_name_mapping[feature_name]
             # Flatten tensors and use English keys
-            encoded_inputs[f'input_ids_{english_feature_name}'] = encoding['input_ids'].squeeze(0)
-            encoded_inputs[f'attention_mask_{english_feature_name}'] = encoding['attention_mask'].squeeze(0)
+            encoded_inputs[f'input_ids_{feature_name}'] = encoding['input_ids'].squeeze(0)
+            encoded_inputs[f'attention_mask_{feature_name}'] = encoding['attention_mask'].squeeze(0)
 
         # Prepare "defect_dimension_numerical" group
         defect_dimension_numerical = []
@@ -137,42 +131,35 @@ class TestDataset(Dataset):
         self.data = dataframe.reset_index(drop=True)
         self.tokenizer = tokenizer
         self.max_length = max_length
-        self.mode = mode  # 取值为 'train'、'val' 或 'test'
+        self.mode = mode  # 'train'、'val' 或 'test'
 
-        # Mapping feature names from Chinese to English
         self.feature_name_mapping = {
-            '病害描述': 'defect_description',
-            '部件': 'component',
-            '预测病害数量修正': 'defect_number_correction',
-            '裂缝宽度': 'crack_width',
-            '病害面积': 'defect_area',
-            '病害长度': 'defect_length',
-            '预测病害数量指示': 'defect_number_indicator',
-            '其他指示符': 'dimension_indicator'
-        }
+            'Defect Description': 'defect_description',
+            'Component': 'component',            
+        }     
 
         # Text feature names
         self.text_features = [
-            '病害描述',
-            '部件',
+            'Defect Description',
+            'Component',
         ]
 
         # Group for "defect_dimension_numerical"
         self.dimension_numerical_features = [
-            '裂缝宽度',           # Crack Width
-            '病害面积',           # Defect Area
-            '病害长度',           # Defect Length
-            '其他指示符'          # Dimension Indicator
+            'Defect Width', 
+            'Defect Area',
+            'Defect Length',
+            'Dimension Specified' 
         ]
 
         # Group for "defect_number"
         self.defect_number_features = [
-            '预测病害数量修正',    # Defect Number Correction
-            '预测病害数量指示'     # Defect Number Indicator
+            'Defect Quantity',
+            'Quantity Specified'
         ]
 
         # Labels
-        self.labels = self.data['病害标度'].values 
+        self.labels = self.data['Defect Level'].values 
         self.ambiguous_labels = self.data['Ambiguous'].values
 
         # Initialize scalers
@@ -218,10 +205,10 @@ class TestDataset(Dataset):
                 return_tensors='pt'
             )
             # Map Chinese feature name to English
-            english_feature_name = self.feature_name_mapping[feature_name]
+            feature_name = self.feature_name_mapping[feature_name]
             # Flatten tensors and use English keys
-            encoded_inputs[f'input_ids_{english_feature_name}'] = encoding['input_ids'].squeeze(0)
-            encoded_inputs[f'attention_mask_{english_feature_name}'] = encoding['attention_mask'].squeeze(0)
+            encoded_inputs[f'input_ids_{feature_name}'] = encoding['input_ids'].squeeze(0)
+            encoded_inputs[f'attention_mask_{feature_name}'] = encoding['attention_mask'].squeeze(0)
 
         # Prepare "defect_dimension_numerical" group
         defect_dimension_numerical = []
@@ -265,39 +252,32 @@ class PredictDataset(Dataset):
         self.data = dataframe.reset_index(drop=True)
         self.tokenizer = tokenizer
         self.max_length = max_length
-        self.mode = mode  # 取值为 'train'、'val' 或 'test'
+        self.mode = mode  # 'train'、'val' 或 'test'
 
-        # Mapping feature names from Chinese to English
         self.feature_name_mapping = {
-            '病害描述': 'defect_description',
-            '部件': 'component',
-            '预测病害数量修正': 'defect_number_correction',
-            '裂缝宽度': 'crack_width',
-            '病害面积': 'defect_area',
-            '病害长度': 'defect_length',
-            '预测病害数量指示': 'defect_number_indicator',
-            '其他指示符': 'dimension_indicator'
+            'Defect Description': 'defect_description',
+            'Component': 'component',            
         }
 
         # Text feature names
         self.text_features = [
-            '病害描述',
-            '部件',
+            'Defect Description',
+            'Component',
         ]
 
         # Group for "defect_dimension_numerical"
         self.dimension_numerical_features = [
-            '裂缝宽度',           # Crack Width
-            '病害面积',           # Defect Area
-            '病害长度',           # Defect Length
-            '其他指示符'          # Dimension Indicator
+            'Defect Width', 
+            'Defect Area',
+            'Defect Length',
+            'Dimension Specified' 
         ]
 
         # Group for "defect_number"
         self.defect_number_features = [
-            '预测病害数量修正',    # Defect Number Correction
-            '预测病害数量指示'     # Defect Number Indicator
-        ]        
+            'Defect Quantity',
+            'Quantity Specified'
+        ]
 
         # Initialize scalers
         self.scalers = {}
@@ -343,10 +323,10 @@ class PredictDataset(Dataset):
                 return_tensors='pt'
             )
             # Map Chinese feature name to English
-            english_feature_name = self.feature_name_mapping[feature_name]
+            feature_name = self.feature_name_mapping[feature_name]
             # Flatten tensors and use English keys
-            encoded_inputs[f'input_ids_{english_feature_name}'] = encoding['input_ids'].squeeze(0)
-            encoded_inputs[f'attention_mask_{english_feature_name}'] = encoding['attention_mask'].squeeze(0)
+            encoded_inputs[f'input_ids_{feature_name}'] = encoding['input_ids'].squeeze(0)
+            encoded_inputs[f'attention_mask_{feature_name}'] = encoding['attention_mask'].squeeze(0)
 
         # Prepare "defect_dimension_numerical" group
         defect_dimension_numerical = []
