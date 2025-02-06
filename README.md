@@ -166,7 +166,7 @@ Below is a detailed explanation of each input feature in the dataset:
 | Defect Length | Length of the defect. Unit: mm. | integer | 100 (i.e., 100mm) |
 | Defect Area | Area of the defect. Unit: mm². | integer | 50000 (i.e., 50000mm²) |
 | Defect Level | Identified Level. | integer | 2 |
-| Ambiguous | Whether the defect is ambiguous | bool | Yes (represented as 1) |
+| Ambiguous | Whether the defect is ambiguous | boolean | Yes (represented as 1) |
 
 
 
