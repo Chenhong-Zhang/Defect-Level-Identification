@@ -10,21 +10,22 @@ import json
 class DynamicLossFunction(nn.Module):
     def __init__(self):
         """
-        动态损失函数，基于AM对样本应用不同的损失策略。
+        A dynamic loss function that applies different loss strategies to samples based on AM.
         """
         super(DynamicLossFunction, self).__init__()
         self.ce_loss = nn.CrossEntropyLoss(reduction='none')
 
     def forward(self, logits, targets, smoothing):
         """
-        计算损失。
+        Compute the loss.
 
         Args:
-            logits (Tensor): 模型的预测结果，形状为 (batch_size, num_classes)
-            targets (Tensor): 真实标签，形状为 (batch_size,)
-            smoothing (Tensor): 张量根据每个样本的AM计算标签平滑程度，形状为 (batch_size,)
+            logits (Tensor): Model predictions, shape (batch_size, num_classes)
+            targets (Tensor): Ground truth labels, shape (batch_size,)
+            smoothing (Tensor): A tensor indicating label smoothing based on each sample’s AM, shape (batch_size,)
+
         Returns:
-            Tensor: 均值损失
+            Tensor: The mean loss
         """
         ce = self.ce_loss(logits, targets)  # Shape: (batch_size,)
         if smoothing is not None and torch.any(smoothing > 0):
@@ -34,9 +35,9 @@ class DynamicLossFunction(nn.Module):
             smooth = smoothing.view(-1, 1)  # Shape: (batch_size, 1)
             smooth_labels = one_hot * (1 - smooth) + smooth / num_classes  # Shape: (batch_size, num_classes)
             log_probs = F.log_softmax(logits, dim=1)  # Shape: (batch_size, num_classes)
-            smoothed_ce = -torch.sum(smooth_labels * log_probs, dim=1)  # Shape: (batch_size,)            
+            smoothed_ce = -torch.sum(smooth_labels * log_probs, dim=1)  # Shape: (batch_size,)
             loss = torch.where(smoothing > 0, smoothed_ce, ce)
-        else:            
+        else:
             loss = ce
         
         return loss.mean()
@@ -45,17 +46,18 @@ class DynamicLossFunction(nn.Module):
 class AMTracker:
     def __init__(self, dataset_size, num_classes):
         self.dataset_size = dataset_size
-        self.num_classes = num_classes  # 总类别数，包括最后一个类别
-        self.am = np.zeros(dataset_size)  # 初始化AM值
+        self.num_classes = num_classes  # Total number of classes, including the last class
+        self.am = np.zeros(dataset_size)  # Initialize AM values
         self.count = np.zeros(dataset_size)
 
     def update_am(self, indices, logits, labels):
         """
-        向量化更新AM值。
-        :param indices: 当前batch中样本的索引，形状为 (batch_size,)
-        :param logits: 当前batch中样本的logits，形状为 (batch_size, num_classes)
-        :param labels: 当前batch中样本的标签，形状为 (batch_size,)
-        """        
+        Vectorized AM update.
+
+        :param indices: Indices of the samples in the current batch, shape (batch_size,)
+        :param logits: Logits for the current batch, shape (batch_size, num_classes)
+        :param labels: Ground truth labels for the current batch, shape (batch_size,)
+        """
         logits = logits.detach().cpu().numpy()  # (batch_size, num_classes)
         labels = labels.detach().cpu().numpy()  # (batch_size,)
         indices = indices.detach().cpu().numpy()
@@ -79,7 +81,7 @@ class AMTracker:
 
     def compute_final_am(self):
         """
-        计算最终的AM值，通常是在每个Epoch结束时调用。
+        Compute the final AM values, typically called at the end of each epoch.
         """
         non_zero_mask = self.count > 0
         self.am[non_zero_mask] /= self.count[non_zero_mask]
@@ -89,7 +91,7 @@ class AMTracker:
 
     def zero_am(self):
         """
-        重置AM值和计数器，在每个Epoch结束后调用。
+        Reset AM values and counters, called after each epoch ends.
         """
         self.am = np.zeros(self.dataset_size)
         self.count = np.zeros(self.dataset_size)
@@ -125,7 +127,7 @@ class AMTrainer(Trainer):
             labels = labels
         else:
             labels = labels[:, 0]
-        indices = inputs.get("idx")    # (batch_size,)
+        indices = inputs.get("idx")  # (batch_size,)
 
         outputs = model(**inputs)
         logits = outputs.get("logits")  # (batch_size, num_classes)
@@ -140,7 +142,7 @@ class AMTrainer(Trainer):
         # Compute smoothing vector
         with torch.no_grad():
             if self.current_epoch < self.hold_epoch:
-                # 在前 hold_epoch 轮，不进行标签平滑
+                # Do not apply label smoothing in the first hold_epoch rounds
                 smoothing = torch.zeros_like(am_tensor)
             else:
                 if self.threshold is not None:
@@ -153,20 +155,20 @@ class AMTrainer(Trainer):
                         if min_am < self.threshold:
                             # Compute smoothing values
                             smoothing_neg = self.max_smoothing * ((smooth_am - self.threshold) / (min_am - self.threshold))**self.smoothing_scale
-                            # Ensure smoothing values are between [0, max_smoothing]
+                            # Ensure smoothing values are within [0, max_smoothing]
                             smoothing_neg = torch.clamp(smoothing_neg, min=0.0, max=self.max_smoothing)
                         else:
                             smoothing_neg = torch.zeros_like(smooth_am)
                     else:
                         smoothing_neg = torch.tensor([], device=logits.device)
 
-                    # Initialize smoothing vector to 0
+                    # Initialize the smoothing vector to 0
                     smoothing = torch.zeros_like(am_tensor)
 
                     # Update smoothing values for samples that need smoothing
                     smoothing[mask_smooth] = smoothing_neg
                 else:
-                    # 如果threshold还未设置，默认smoothing为0
+                    # If threshold is not yet set, default smoothing to 0
                     smoothing = torch.zeros_like(am_tensor)
 
         # Compute loss
