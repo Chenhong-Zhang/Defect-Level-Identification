@@ -144,8 +144,6 @@ Try optimize these parameters based on experiments on your own dataset.
 
 ## Data Organization
 
-This section describes the structure and organization of the defect datasets provided for training, testing, and validation.
-
 ### Datasets Overview
 
 There are two datasets provided for demonstration:
