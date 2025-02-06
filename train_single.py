@@ -24,50 +24,50 @@ def softmax(logits, axis=1):
 
 def compute_metrics(eval_pred):
     """
-    自定义 compute_metrics 方法，计算指定的五个指标，并增加一个 Combined Metric。
+    Custom compute_metrics method that calculates five specified metrics and adds a Combined Metric.
     
-    参数:
-    - eval_pred: 包含 logits 和 labels 的元组
-    - trainer: 包含 threshold 属性的训练器对象
+    Parameters:
+    - eval_pred: a tuple containing logits and labels
+    - trainer: a trainer object that has a threshold attribute
     """
     
     logits, labels = eval_pred
     num_classes = logits.shape[1]
 
-    # 提取标签信息
-    labels_array = labels[:, 0].astype(int)      # 真实的类别标签
-    is_ambiguous = labels[:, 1].astype(bool)     # 真实是否为 Ambiguous
+    # Extract label information
+    labels_array = labels[:, 0].astype(int)      # True class labels
+    is_ambiguous = labels[:, 1].astype(bool)     # True Ambiguous or not
 
-    # Step 1: 计算 margins（用于判断是否 Ambiguous）
+    # Step 1: Calculate margins (for judging whether Ambiguous)
     margins = np.zeros(labels.shape[0])
     
-    # 处理第一类
+    # Process the first class
     mask_first = (labels_array == 0)
     margins[mask_first] = logits[mask_first, 0] - logits[mask_first, 1]
 
-    # 处理最后一类
+    # Process the last class
     mask_last = (labels_array == num_classes - 1)
     margins[mask_last] = logits[mask_last, -1] - logits[mask_last, -2]
 
-    # 处理中间类
+    # Process the middle classes
     mask_middle = ~(mask_first | mask_last)
     if np.any(mask_middle):
         middle_labels = labels_array[mask_middle]
         correct_class = middle_labels
-        # 计算两者之间的最小值
+        # Calculate the minimum of the two
         margin_left = logits[mask_middle, correct_class] - logits[mask_middle, correct_class - 1]
         margin_right = logits[mask_middle, correct_class] - logits[mask_middle, correct_class + 1]
         margins[mask_middle] = np.minimum(margin_left, margin_right)        
 
-    # Step 2: 根据阈值划分为 Ambiguous 和 Unambiguous
+    # Step 2: Classify as Ambiguous or Unambiguous based on the threshold
     threshold = trainer.threshold if hasattr(trainer, 'threshold') and trainer.threshold is not None else 0.0
     pred_ambiguous = margins < threshold
     pred_unambiguous = ~pred_ambiguous
 
-    # Step 3: 计算模型预测为 Ambiguous 的 precision 分数
+    # Step 3: Compute F1 score for the samples predicted as Ambiguous
     f1_ambiguous = f1_score(is_ambiguous, pred_ambiguous, zero_division=0)
 
-    # Step 4: 计算真实为 Ambiguous 的 RMSE（使用 Ambiguous 方法：期望值）
+    # Step 4: Calculate RMSE for samples that are actually Ambiguous (using the Ambiguous method: expected value)
     mask_actual_ambiguous = is_ambiguous
     logits_actual_ambiguous = logits[mask_actual_ambiguous]
     labels_actual_ambiguous = labels_array[mask_actual_ambiguous]
@@ -80,7 +80,7 @@ def compute_metrics(eval_pred):
     else:
         rmse_actual_ambiguous = 0.0
 
-    # Step 5: 计算真实为 Unambiguous 的 F1 Score（使用 Unambiguous 方法：argmax）
+    # Step 5: Calculate F1 score for samples that are actually Unambiguous (using the Unambiguous method: argmax)
     mask_actual_unambiguous = ~is_ambiguous
     logits_actual_unambiguous = logits[mask_actual_unambiguous]
     labels_actual_unambiguous = labels_array[mask_actual_unambiguous]
@@ -91,7 +91,7 @@ def compute_metrics(eval_pred):
     else:
         f1_actual_unambiguous = 0.0
 
-    # Step 6: 计算预测为 Ambiguous 但实际为 Unambiguous 的样本的 RMSE（使用 Ambiguous 方法：期望值）
+    # Step 6: Calculate the RMSE of samples predicted as Ambiguous but actually Unambiguous (using the Ambiguous method: expected value)
     mask_pred_ambiguous_but_unambiguous = pred_ambiguous & (~is_ambiguous)
     logits_pred_ambiguous_but_unambiguous = logits[mask_pred_ambiguous_but_unambiguous]
     labels_pred_ambiguous_but_unambiguous = labels_array[mask_pred_ambiguous_but_unambiguous]
@@ -103,7 +103,7 @@ def compute_metrics(eval_pred):
     else:
         rmse_pred_ambiguous_but_unambiguous = 0.0
 
-    # Step 7: 计算预测为 Unambiguous 但实际为 Ambiguous 的样本的 RMSE（使用 Unambiguous 方法：argmax）
+    # Step 7: Calculate the RMSE of samples predicted as Unambiguous but actually Ambiguous (using the Unambiguous method: argmax)
     mask_pred_unambiguous_but_ambiguous = pred_unambiguous & is_ambiguous
     logits_pred_unambiguous_but_ambiguous = logits[mask_pred_unambiguous_but_ambiguous]
     labels_pred_unambiguous_but_ambiguous = labels_array[mask_pred_unambiguous_but_ambiguous]
@@ -131,16 +131,16 @@ def compute_metrics(eval_pred):
 
 def compute_metrics_test(logits, labels, is_ambiguous, am_threshold):
     """
-    计算测试过程中所需的指标，包括五个主要指标和一个综合指标。
+    Compute the metrics required during testing, including five main metrics and a combined metric.
     
-    参数:
-    - logits: 模型输出的 logits，形状为 (num_samples, num_classes)
-    - labels: 真实的类别标签，形状为 (num_samples,)
-    - is_ambiguous: 真实是否为 Ambiguous 的布尔数组，形状为 (num_samples,)
-    - am_threshold: 用于划分 Ambiguous 和 Unambiguous 的阈值
+    Parameters:
+    - logits: Model output logits of shape (num_samples, num_classes)
+    - labels: The true class labels of shape (num_samples,)
+    - is_ambiguous: A boolean array of shape (num_samples,) indicating whether the sample is Ambiguous
+    - am_threshold: The threshold used to separate Ambiguous and Unambiguous
     
-    返回:
-    - 一个包含所有计算指标的字典
+    Returns:
+    - A dictionary containing all computed metrics
     """
 
     is_ambiguous = is_ambiguous.astype(bool)
@@ -148,39 +148,39 @@ def compute_metrics_test(logits, labels, is_ambiguous, am_threshold):
     num_classes = logits.shape[1]
     total_samples = len(labels)
     
-    # 初始化预测数组
+    # Initialize prediction array
     preds = np.zeros(total_samples)
     labels_array = labels.astype(int)
     
-    # Step 1: 计算 margins（用于判断是否 Ambiguous）
+    # Step 1: Calculate margins (for judging whether Ambiguous)
     margins = np.zeros(labels.shape[0])
     
-    # 处理第一类
+    # Process the first class
     mask_first = (labels_array == 0)
     margins[mask_first] = logits[mask_first, 0] - logits[mask_first, 1]
 
-    # 处理最后一类
+    # Process the last class
     mask_last = (labels_array == num_classes - 1)
     margins[mask_last] = logits[mask_last, -1] - logits[mask_last, -2]
 
-    # 处理中间类
+    # Process the middle classes
     mask_middle = ~(mask_first | mask_last)
     if np.any(mask_middle):
         middle_labels = labels_array[mask_middle]
         correct_class = middle_labels
-        # 计算两者之间的最小值
+        # Calculate the minimum of the two
         margin_left = logits[mask_middle, correct_class] - logits[mask_middle, correct_class - 1]
         margin_right = logits[mask_middle, correct_class] - logits[mask_middle, correct_class + 1]
         margins[mask_middle] = np.minimum(margin_left, margin_right)
     
-    # Step 2: 根据阈值划分为 Ambiguous 和 Unambiguous    
+    # Step 2: Classify as Ambiguous or Unambiguous based on am_threshold   
     pred_ambiguous = margins < am_threshold
     pred_unambiguous = ~pred_ambiguous
     
-    # Step 3: 计算模型预测为 Ambiguous 的 precision 分数
+    # Step 3: Compute F1 score for samples predicted as Ambiguous
     f1_ambiguous = f1_score(is_ambiguous, pred_ambiguous, zero_division=0)
     
-    # Step 4: 计算真实为 Ambiguous 的 RMSE（使用 Ambiguous 方法：期望值）
+    # Step 4: Calculate RMSE for samples that are actually Ambiguous (using the Ambiguous method: expected value)
     mask_actual_ambiguous = is_ambiguous
     logits_actual_ambiguous = logits[mask_actual_ambiguous]
     labels_actual_ambiguous = labels_array[mask_actual_ambiguous]
@@ -193,7 +193,7 @@ def compute_metrics_test(logits, labels, is_ambiguous, am_threshold):
     else:
         rmse_actual_ambiguous = 0.0
     
-    # Step 5: 计算真实为 Unambiguous 的 F1 Score（使用 Unambiguous 方法：argmax）
+    # Step 5: Calculate F1 score for samples that are actually Unambiguous (using the Unambiguous method: argmax)
     mask_actual_unambiguous = ~is_ambiguous
     logits_actual_unambiguous = logits[mask_actual_unambiguous]
     labels_actual_unambiguous = labels_array[mask_actual_unambiguous]
@@ -204,7 +204,7 @@ def compute_metrics_test(logits, labels, is_ambiguous, am_threshold):
     else:
         f1_actual_unambiguous = 0.0
     
-    # Step 6: 计算预测为 Ambiguous 但实际为 Unambiguous 的样本的 RMSE（使用 Ambiguous 方法：期望值）
+    # Step 6: Calculate the RMSE of samples predicted as Ambiguous but actually Unambiguous (using the Ambiguous method: expected value)
     mask_pred_ambiguous_but_unambiguous = pred_ambiguous & (~is_ambiguous)
     logits_pred_ambiguous_but_unambiguous = logits[mask_pred_ambiguous_but_unambiguous]
     labels_pred_ambiguous_but_unambiguous = labels_array[mask_pred_ambiguous_but_unambiguous]
@@ -216,7 +216,7 @@ def compute_metrics_test(logits, labels, is_ambiguous, am_threshold):
     else:
         rmse_pred_ambiguous_but_unambiguous = 0.0
     
-   # Step 7: 计算预测为 Unambiguous 但实际为 Ambiguous 的样本的 RMSE（使用 Unambiguous 方法：argmax）
+    # Step 7: Calculate the RMSE of samples predicted as Unambiguous but actually Ambiguous (using the Unambiguous method: argmax)
     mask_pred_unambiguous_but_ambiguous = pred_unambiguous & is_ambiguous
     logits_pred_unambiguous_but_ambiguous = logits[mask_pred_unambiguous_but_ambiguous]
     labels_pred_unambiguous_but_ambiguous = labels_array[mask_pred_unambiguous_but_ambiguous]
@@ -227,16 +227,15 @@ def compute_metrics_test(logits, labels, is_ambiguous, am_threshold):
     else:
         rmse_pred_unambiguous_but_ambiguous = 0.0 
     
-    
-    # Step 8: 存储预测结果
-    # 对于实际为 Ambiguous 的样本，存储期望值预测
+    # Step 8: Store prediction results
+    # For samples that are actually Ambiguous, store the expected value predictions
     if len(labels_actual_ambiguous) > 0:
         preds[mask_actual_ambiguous] = expected_values_actual_ambiguous
-    # 对于实际为 Unambiguous 的样本，存储 argmax 预测（已在步骤 5 中计算）
+    # For samples that are actually Unambiguous, store the argmax predictions (already computed in Step 5)
     if len(labels_actual_unambiguous) > 0:
         preds[mask_actual_unambiguous] = preds_actual_unambiguous
     
-    # 返回所有指标以及相关信息
+    # Return all metrics and related information
     return {        
         'margins': margins,
         'preds': preds, 
@@ -249,7 +248,7 @@ def compute_metrics_test(logits, labels, is_ambiguous, am_threshold):
     }
 
 
-# 主函数
+# Main function
 def main():
     # Load configuration from JSON file    
     parser = argparse.ArgumentParser()
@@ -361,7 +360,7 @@ def main():
         train_dataset=train_dataset,
         eval_dataset=val_dataset,
         callbacks=callbacks,
-        compute_metrics = compute_metrics
+        compute_metrics=compute_metrics
     )
 
     # Start training
@@ -403,7 +402,7 @@ def main():
     best_checkpoint_am_threshold = np.percentile(best_checkpoint_am_values, am_percentile)
 
     # Metrics
-    test_metrics = compute_metrics_test(test_logits, test_data["病害标度"].values, test_data["Ambiguous"].values, best_checkpoint_am_threshold)  
+    test_metrics = compute_metrics_test(test_logits, test_data["Defect Level"].values, test_data["Ambiguous"].values, best_checkpoint_am_threshold)  
     output_metrics = {
         'f1_ambiguous': test_metrics.get('f1_ambiguous', 0.0),
         'f1_actual_unambiguous': test_metrics.get('f1_actual_unambiguous', 0.0),
