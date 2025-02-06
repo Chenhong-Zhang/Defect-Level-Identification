@@ -140,7 +140,36 @@ Try optimize these parameters based on experiments on your own dataset.
   Number of epochs before activating the dynamic partitioning.  
 
 - **`num_base_learners`**  
-  Number of base learners used for ensemble.  
+  Number of base learners used for ensemble.
+
+## Data Organization
+
+This section describes the structure and organization of the defect datasets provided for training, testing, and validation.
+
+### Datasets Overview
+
+There are two datasets provided for demonstration:
+
+- **Training Data**: Contains 9 fields.
+- **Test/Validation Data**: Contains 10 fields, with an additional *Ambiguous* column.
+
+### Feature Descriptions
+
+Below is a detailed explanation of each input feature in the dataset:
+
+| Feature | Explanation | Data Type | Example Value |
+|---------|------------|-----------|---------------|
+| Defect Description | Text description of the defects. | string | At the edge of beam 17# and beam 18#, there are 3 instances of exposed reinforcement at the wet joints, each covering a 0.1m x 0.2m area. |
+| Component | The component where the defect is located. | string | Load-Bearing Component |
+| Quantity Specified | Indicates if the defect quantity is explicitly provided. | boolean | Yes (represented as 1) |
+| Defect Quantity | Specified quantity of the defects. | integer | 3 |
+| Dimension Specified | Indicates if the defect dimension is explicitly provided. | boolean | Yes (represented as 1) |
+| Defect Width | Width of the defect (for crack-related defects only). Unit: mm. | float | 0.01 (i.e., 0.01mm) |
+| Defect Length | Length of the defect. Unit: mm. | integer | 100 (i.e., 100mm) |
+| Defect Area | Area of the defect. Unit: mm². | integer | 50000 (i.e., 50000mm²) |
+| Defect Level | Identified Level. | integer | 2 |
+| Ambiguous | Whether the defect is ambiguous | bool | Yes (represented as 1) |
+
 
 
 
